@@ -27,15 +27,18 @@ policy, hooks, and lifecycle controls on top.
 import os
 import subprocess
 
-from anthropic import Anthropic
+try:
+    from agents.dashscope_compat import AnthropicCompat
+except ModuleNotFoundError:
+    from dashscope_compat import AnthropicCompat
 from dotenv import load_dotenv
 
 load_dotenv(override=True)
 
-if os.getenv("ANTHROPIC_BASE_URL"):
-    os.environ.pop("ANTHROPIC_AUTH_TOKEN", None)
-
-client = Anthropic(base_url=os.getenv("ANTHROPIC_BASE_URL"))
+client = AnthropicCompat(
+    api_key=os.getenv("DASHSCOPE_API_KEY"),
+    base_url=os.getenv("DASHSCOPE_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1"),
+)
 MODEL = os.environ["MODEL_ID"]
 
 SYSTEM = f"You are a coding agent at {os.getcwd()}. Use bash to solve tasks. Act, don't explain."
